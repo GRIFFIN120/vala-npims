@@ -1,0 +1,8 @@
+# Project exclude paths
+/vala-base/target/
+/vala-base-framework/target/
+/vala-commons/target/
+/vala-service-jsoup/target/
+/vala-service-map/target/
+/vala-service-websocket/target/
+/vala-web-demo/target/

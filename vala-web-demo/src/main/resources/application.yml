@@ -1,0 +1,53 @@
+server:
+  port: 8001
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  datasource:
+    url: jdbc:mysql://120.27.61.185:3306/npims?useSSL=false&serverTimezone=GMT&allowPublicKeyRetrieval=true
+    username: root
+    password: 19870120
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    initialSize: 5
+    minIdle: 5
+    maxActive: 20
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    filters: slf4j
+    maxPoolPreparedStatementPerConnectionSize: 20
+    useGlobalDataSourceStat: true
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=50
+
+  devtools:
+    restart:
+      enabled: true
+
+
+fdfs:
+  soTimeout: 1500
+  connectTimeout: 600
+  pool:
+    max-total: 153
+    max-wait-millis: 102
+  thumbImage:
+    width: 150
+    height: 150
+  trackerList:
+    - 120.27.61.185:22122
+  web-server-url: http://120.27.61.185/
+  spring:
+    http:
+      multipart:
+        max-file-size: 100MB
+        max-request-size: 100MB
+
