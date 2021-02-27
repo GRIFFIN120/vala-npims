@@ -18,7 +18,7 @@ public class TreeUtils {
             Integer id = it1.next();
             O bean = map.get(id);
             Integer pid = bean.getPid();
-            if(pid==0){
+            if(pid!=null&&pid==0){
                 results.add(bean);
             }else if(map.containsKey(pid)){
                 O parent = map.get(pid);

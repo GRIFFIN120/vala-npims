@@ -1,5 +1,9 @@
 package com.vala.commons.util;
 
+import javax.persistence.FetchType;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -9,7 +13,29 @@ import java.util.List;
 public class BeanUtils {
 
 
-    public static List<Field> hasAnnotation(Class domain, Class annotationClass){
+    public static void simplify(Class simperClass, Object target) throws Exception {
+        if(target==null) return;
+        List<Field> simperFields = getCompleteFields(simperClass);
+        List<Field> targetFields = getCompleteFields(target.getClass());
+
+        for (Field targetField : targetFields) {
+            boolean flag = false;
+            for (Field simperField : simperFields) {
+                if(targetField.getName().equals(simperField.getName())){
+                    flag = true;
+                    break;
+                }
+            }
+            if(!flag){
+                targetField.set(target,null);
+            }
+        }
+
+
+    }
+
+
+    public static List<Field> getFieldsByAnnotation(Class domain, Class annotationClass){
         List<Field> list = new ArrayList<>();
         List<Field> completeFields = BeanUtils.getCompleteFields(domain);
         for (Field f : completeFields) {
@@ -21,6 +47,41 @@ public class BeanUtils {
         return list;
     }
 
+    public static List<Field> getLazyFieldInListForm(Class domain){
+        List<Field> lzFs = new ArrayList<>();
+        List<Field> fs = BeanUtils.getFieldsByAnnotation(domain, ManyToMany.class);
+        List<Field> fs1 = BeanUtils.getFieldsByAnnotation(domain, OneToMany.class);
+        for (Field f : fs) {
+            FetchType fetch = f.getAnnotation(ManyToMany.class).fetch();
+            if(fetch.equals(FetchType.LAZY)){
+                lzFs.add(f);
+            }
+        }
+        for (Field f : fs1) {
+            FetchType fetch = f.getAnnotation(OneToMany.class).fetch();
+            if(fetch.equals(FetchType.LAZY)){
+                lzFs.add(f);
+            }
+        }
+        return lzFs;
+    }
+
+
+
+
+    public static Class<?> getFieldParameterizedType(Field f) {
+        f.setAccessible(true);
+        Class<?> fieldType = f.getType();
+        if (fieldType.equals(List.class)) {
+            Type genericType = f.getGenericType();
+            if (genericType instanceof ParameterizedType) {
+                ParameterizedType pt = (ParameterizedType) genericType;
+                Class<?> actualTypeArgument = (Class<?>)pt.getActualTypeArguments()[0];
+                return actualTypeArgument;
+            }
+        }
+        return null;
+    }
 
 
     public static Class<?> getFieldParameterizedType(Class domain, String field) {
@@ -103,21 +164,29 @@ public class BeanUtils {
         }
     }
 
+    public static void extend(Class domain, Object target, Object source ) {
+        extend(domain,target,source,null);
+    }
+
     /**
      * 用ext的属性覆盖bean 的
      * @param domain
-     * @param bean
-     * @param ext
+     * @param target
+     * @param source
      */
-    public static void extend(Class domain, Object bean, Object ext ) {
+    public static void extend(Class domain, Object target, Object source, Class annoClass ) {
         Field[] fs = domain.getDeclaredFields();
 
         for(Field f:fs){
+            if(annoClass!=null&&f.isAnnotationPresent(annoClass)) {
+                continue;
+            }
+
             f.setAccessible(true);
             try {
-                Object val = f.get(ext);
+                Object val = f.get(source);
                 if(val!=null){
-                    f.set(bean,val);
+                    f.set(target,val);
                 }
             } catch (Exception e) {
                 continue;
@@ -125,7 +194,7 @@ public class BeanUtils {
         }
         Class pcls = domain.getSuperclass();
         if(!Object.class.equals(pcls)){
-            extend(pcls, bean, ext);
+            extend(pcls, target, source, annoClass);
         }
     }
 

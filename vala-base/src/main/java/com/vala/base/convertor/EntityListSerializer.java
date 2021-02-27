@@ -29,7 +29,6 @@ public class EntityListSerializer {
 
             jsonGenerator.writeStartArray();
             try {
-                System.out.println(baseEntities.size());
                 for (BaseEntity baseEntity : baseEntities) {
                     jsonGenerator.writeObject(baseEntity.getId());
                 }

@@ -39,8 +39,15 @@ public class BaseEntity implements Serializable {
     @Column
     public String code;
 
+    @Column
+    public Double lng;
+    @Column
+    public Double lat;
+
+
     // 用于排序
     @JsonFormat( pattern="yyyy/MM/dd HH:mm:ss", timezone = "GMT+8")
+    @CreatedDate
     @Column
     public Date timestamp;
 

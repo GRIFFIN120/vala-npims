@@ -2,9 +2,11 @@ package com.vala.commons.bean;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @NoArgsConstructor
+@ToString(callSuper = true)
 public class ResponseResult<T> {
 
     private Integer code = 200;

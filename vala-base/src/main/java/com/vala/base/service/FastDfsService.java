@@ -68,6 +68,14 @@ public class FastDfsService {
         return bytes;
     }
 
+    public String upload(MultipartFile file) throws Exception {
+        String[] strs = this.getNameAndExtension(file.getOriginalFilename());
+        return this.upload(file.getBytes(),strs[1]);
+
+
+    }
+
+
 
     public String upload(byte[] bytes, String fix){
         StorePath storePath = storageClient.uploadFile(new ByteArrayInputStream(bytes), bytes.length, fix, null);
@@ -88,13 +96,17 @@ public class FastDfsService {
         }
     }
 
-    public void deleteBeanFile(Object bean) throws Exception {
+    public void deleteBeanFile(Object bean) throws Exception{
+        if(bean==null) return;
         List<Field> completeFields = BeanUtils.getCompleteFields(bean.getClass());
         for (Field f : completeFields) {
             if(f.isAnnotationPresent(FileColumn.class)){
                 String path = (String) f.get(bean);
-                boolean flag = this.delete(path);
-                if(!flag) throw new Exception("删除不成功");
+                if(StringUtils.isNotEmpty(path)){
+                    boolean flag = this.delete(path);
+//                    throw new Exception("无法删除文件:"+path);
+                    if(!flag) System.out.println("无法删除文件:"+path);
+                }
             }
         }
     }
@@ -158,9 +170,35 @@ public class FastDfsService {
         type = type==null?"png":type;
         StorePath storePath = this.storageClient.uploadImageAndCrtThumbImage(
                 mfile.getInputStream(), mfile.getSize(), type, null);
+
+
         String path = storePath.getFullPath();
         String thumb = storePath.getGroup()+"/"+
                 thumbImageConfig.getThumbImagePath(storePath.getPath());
         return new String[]{path,thumb};
     }
+
+
+    public String[] uploadImage(byte[] bytes, String fix) throws IOException {
+
+        StorePath storePath = this.storageClient.uploadImageAndCrtThumbImage(
+                new ByteArrayInputStream(bytes), bytes.length, fix, null);
+        String path = storePath.getFullPath();
+        String thumb = storePath.getGroup()+"/"+
+                thumbImageConfig.getThumbImagePath(storePath.getPath());
+        return new String[]{path,thumb};
+    }
+
+
+
+    public static final String DOT = ".";
+    public String[] getNameAndExtension(String fileName) {
+        if (StringUtils.INDEX_NOT_FOUND == StringUtils.indexOf(fileName, DOT))
+            return new String[]{fileName, StringUtils.EMPTY};
+        int DOT_INDEX = StringUtils.lastIndexOf(fileName, DOT);
+        String name = StringUtils.substring(fileName,0,DOT_INDEX).trim();
+        String ext = StringUtils.substring(fileName,DOT_INDEX+1).trim();
+        return new String[]{name,ext};
+    }
+
 }

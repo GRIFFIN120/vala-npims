@@ -2,6 +2,7 @@ package com.vala.base.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
@@ -12,6 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @MappedSuperclass//实体集成映射
+@ToString(callSuper = true)
 public class TreeEntity<T extends TreeEntity> extends BaseEntity {
 
     @Column

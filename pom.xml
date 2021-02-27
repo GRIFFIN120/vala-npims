@@ -23,10 +23,7 @@
         <module>vala-commons</module>
         <module>vala-base</module>
         <module>vala-base-framework</module>
-        <module>vala-service-jsoup</module>
-        <module>vala-service-map</module>
-        <module>vala-service-websocket</module>
-        <module>vala-web-demo</module>
+        <module>vala-web-carbon</module>
     </modules>
 
     <dependencies>
