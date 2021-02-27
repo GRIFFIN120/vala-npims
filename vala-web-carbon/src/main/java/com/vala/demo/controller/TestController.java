@@ -149,8 +149,7 @@ public class TestController {
 
 
     @RequestMapping("/t1")
-    public String test() throws Exception {
-        System.out.println(123);
+    public String test()  {
         return "hello";
     }
 
