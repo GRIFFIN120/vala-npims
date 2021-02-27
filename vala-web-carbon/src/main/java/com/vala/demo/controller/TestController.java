@@ -150,9 +150,7 @@ public class TestController {
 
     @RequestMapping("/t1")
     public void test() throws Exception {
-
-
-
+        System.out.println(123);
     }
 
 }
