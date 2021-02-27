@@ -150,7 +150,7 @@ public class TestController {
 
     @RequestMapping("/t1")
     public String test()  {
-        return "hello";
+        return "hello vala";
     }
 
 }
