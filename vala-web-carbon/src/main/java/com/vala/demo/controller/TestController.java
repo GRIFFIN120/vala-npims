@@ -146,7 +146,7 @@ public class TestController {
 
     @RequestMapping("/t1")
     public String test()  {
-        return "hello vala";
+        return "hello VALA!";
     }
 
 }
