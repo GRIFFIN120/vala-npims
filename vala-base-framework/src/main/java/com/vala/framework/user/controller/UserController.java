@@ -22,7 +22,8 @@ public class UserController extends BaseController<UserBasic> {
             String token = JwtUtils.sign(user.getUsername(),user.getId());
             userBasic.setToken(token);
             this.setSession("UID",userBasic.getId());
-            return new ResponseResult("登录成功", userBasic);
+            String message = "登录成功！欢迎您，"+ userBasic.name;
+            return new ResponseResult(message, userBasic);
         }else {
             return new ResponseResult(500,"用户不存在或密码不正确");
         }
@@ -30,7 +31,7 @@ public class UserController extends BaseController<UserBasic> {
     @RequestMapping("/logout")
     public ResponseResult login() throws Exception {
         this.removeSession("UID");
-        return new ResponseResult(200,"已登出系统，欢迎再次使用");
+        return new ResponseResult(200,"您已登出系统，欢迎再次使用。");
     }
 
     @RequestMapping("/changePassword")

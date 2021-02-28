@@ -11,4 +11,5 @@ public final class Constants {
     public final static String SORT_DOWN = "after";
 
     public final static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd");
+    public final static SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
 }

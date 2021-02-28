@@ -70,16 +70,18 @@ public class FastDfsService {
 
     public String upload(MultipartFile file) throws Exception {
         String[] strs = this.getNameAndExtension(file.getOriginalFilename());
-        return this.upload(file.getBytes(),strs[1]);
-
-
+        String url =  this.upload(file.getBytes(),strs[1]);
+        System.out.println(location+url);
+        return url;
     }
 
 
 
     public String upload(byte[] bytes, String fix){
         StorePath storePath = storageClient.uploadFile(new ByteArrayInputStream(bytes), bytes.length, fix, null);
-        return storePath.getFullPath();
+        String url = storePath.getFullPath();
+        System.out.println(location+url);
+        return url;
     }
 
     public boolean delete(String path){

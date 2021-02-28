@@ -15,11 +15,14 @@ import java.util.List;
 @Data
 public class DataFrameTreeBean extends TreeEntity {
     public Integer frameId;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="data_id")
     private DataBean data;
-    public Double parameter;
 
+    public Double parameter;
+    public Double max;
+    public Double predict;
 
     @Transient
     List<DataItemBean> dataItems;

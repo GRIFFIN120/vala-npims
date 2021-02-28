@@ -30,10 +30,7 @@ import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class BaseController<T extends BaseEntity> extends BaseControllerWraper<T> implements ApplicationListener<ContextRefreshedEvent> {
     public Class<T> domain;
@@ -47,18 +44,6 @@ public class BaseController<T extends BaseEntity> extends BaseControllerWraper<T
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         domain = (Class<T>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
         baseService.setDomain(domain);
-    }
-
-
-    @RequestMapping("/input/{type}")
-    public ResponseResult input(@PathVariable String type,@RequestPart(value = "file") MultipartFile file) {
-
-        return new ResponseResult("上传成功");
-    }
-
-    @RequestMapping("/output/{type}")
-    public ResponseResult output(@PathVariable String type,@RequestPart(value = "file") MultipartFile file) {
-        return new ResponseResult();
     }
 
 
@@ -94,31 +79,15 @@ public class BaseController<T extends BaseEntity> extends BaseControllerWraper<T
         }
     }
 
-
-    @Transactional
-    @RequestMapping("/update/many/{field}/{id}")
-    public ResponseResult distinct(@PathVariable Integer id, @PathVariable String field , @RequestBody List<BaseEntity> list) throws Exception {
-
-        Field f = domain.getDeclaredField(field);
-        if(f.getType().equals(List.class)){
-            T bean = this.baseService.get(id);
-            if(bean!=null){
-                f.set(bean,list);
-                this.baseService.saveOrUpdate(bean);
-            }else{
-                return new ResponseResult(500,"数据未找到!");
-            }
-        }else{
-            return new ResponseResult(500,"字段类型错误!");
-        }
-        return new ResponseResult(200);
-    }
-
-
+    /**
+     * 所有数据按字段去重后的的简单格式（可扩展为按多个字段去重）
+     * @param field
+     * @return
+     * @throws Exception
+     */
     @RequestMapping("/distinct/{field}")
     public ResponseResult
     distinct(@PathVariable String field){
-
         String sql = "SELECT DISTINCT("+field+") FROM " + this.domain.getSimpleName();
         Query nativeQuery = this.baseService.getEntityManager().createQuery(sql);
         List<String> resultList = nativeQuery.getResultList();
@@ -131,6 +100,12 @@ public class BaseController<T extends BaseEntity> extends BaseControllerWraper<T
         return new ResponseResult(list);
     }
 
+    /**
+     * 所有数据的简单格式
+     * @param data
+     * @return
+     * @throws Exception
+     */
     @RequestMapping("/simple")
     public ResponseResult simple(@RequestBody(required=false) T data) throws Exception {
         SearchBean<T> params = new SearchBean<>();
@@ -146,15 +121,26 @@ public class BaseController<T extends BaseEntity> extends BaseControllerWraper<T
         return new ResponseResult(list);
     }
 
+
+
     @ResponseBody
     @RequestMapping("/fields")
     public ResponseResult fields() throws Exception {
         // 搜索前校验
-        List<String> list = new ArrayList<>();
+        Map<String,String> map = new LinkedHashMap<>();
         List<Field> completeFields = BeanUtils.getCompleteFields(domain);
         for (Field completeField : completeFields) {
             String key = completeField.getName();
-            if(!list.contains(key))list.add(key);
+            String type = completeField.getType().getSimpleName();
+            if(!map.containsKey(key))map.put(key,type);
+        }
+
+        List<KV> list = new ArrayList<>();
+        for (String code : map.keySet()) {
+            KV k = new KV();
+            k.code = code;
+            k.name = map.get(code);
+            list.add(k);
         }
         return new ResponseResult(list);
     }
@@ -193,6 +179,7 @@ public class BaseController<T extends BaseEntity> extends BaseControllerWraper<T
     @RequestMapping("/query")
     public ResponseResult query(@RequestBody SearchBean<T> params) throws Exception {
         SearchResult<T> result = baseService.search(params);
+        this.beforeOutput(result.getList());
         return new ResponseResult(result);
     }
 
@@ -219,6 +206,7 @@ public class BaseController<T extends BaseEntity> extends BaseControllerWraper<T
             }
             baseService.getRepo().saveAll(list);
         }
+        this.beforeOutput(list);
         return new ResponseResult(200,"添加成功", list);
     }
 
@@ -237,7 +225,9 @@ public class BaseController<T extends BaseEntity> extends BaseControllerWraper<T
     public ResponseResult<T> update(@RequestBody T ext) throws Exception {
         this.beforeUpdate(ext,null);
         T t = this.baseService.saveOrUpdate(ext);
-        return new ResponseResult(200,"更新成功",t);
+        this.beforeOutput(t);
+        String msg = "更新成功";
+        return new ResponseResult(t);
     }
     /**
      * 更新 （PUT）
@@ -256,8 +246,9 @@ public class BaseController<T extends BaseEntity> extends BaseControllerWraper<T
             field.setAccessible(true);
             field.set(t,null);
         }
-
-        return new ResponseResult(200,"更新成功",t);
+        this.beforeOutput(t);
+        String msg = "更新成功";
+        return new ResponseResult(t);
     }
 
     /**
@@ -275,6 +266,7 @@ public class BaseController<T extends BaseEntity> extends BaseControllerWraper<T
             if(bean!=null)
             results.add(bean);
         }
+        this.beforeOutput(results);
         if(results.size()==0){
             return new ResponseResult(null);
         }else if(results.size()==1){
@@ -421,11 +413,8 @@ public class BaseController<T extends BaseEntity> extends BaseControllerWraper<T
                 t.setTimestamp(date1);
                 this.baseService.saveOrUpdate(t);
             }
-
-
-
-
-            return new ResponseResult<T>("移动成功",dg);
+            String msg = "移动成功";
+            return new ResponseResult<T>(dg);
         }else {
             return new ResponseResult(400, "数据结构不是树形");
         }

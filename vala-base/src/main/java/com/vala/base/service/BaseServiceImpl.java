@@ -185,7 +185,7 @@ public class BaseServiceImpl<T extends BaseEntity> implements BaseService<T> {
             Pageable pageable = PageRequest.of(page-1, size, sort);
             Page p = this.getRepo().findAll(example, pageable);
             List<T> list = p.getContent();
-            this.eraseLazy(list);
+//            this.eraseLazy(list);
             return new SearchResult<T>(p.getTotalElements(), Long.valueOf(list.size()), page, size, p.getTotalPages(), search.getSortColumn(), search.getDirection(), list);
         }else {
             List<T> list = this.getRepo().findAll(example, sort);

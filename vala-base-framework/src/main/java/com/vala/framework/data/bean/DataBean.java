@@ -19,12 +19,15 @@ public class DataBean extends BaseEntity {
     private Integer scaleId;
     private Integer unitId;
 
-    private Integer uid;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="group_id")
+    private DataGroupEntity group;
+
+
 
     @JsonIgnore
     @OneToMany(mappedBy="data", cascade = {CascadeType.REMOVE},fetch = FetchType.LAZY)
-    public List<DataItemBean> images = new ArrayList<>();
-
+    public List<DataItemBean> items = new ArrayList<>();
 
 
     @ManyToOne(fetch = FetchType.EAGER)

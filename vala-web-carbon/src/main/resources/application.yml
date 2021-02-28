@@ -49,7 +49,7 @@ fdfs:
     height: 150
   trackerList:
     - 8.131.72.230:22122
-  web-server-url: http://8.131.72.230/
+  web-server-url: http://8.131.72.230:8888/
   spring:
     http:
       multipart:

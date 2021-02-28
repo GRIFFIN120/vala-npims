@@ -73,12 +73,12 @@ public class MetaItemController extends BaseController<MetaItemEntity> {
 
 
     @Transactional
-    @RequestMapping("/copy")
-    public ResponseResult copy(String fromEntity, String fromType, String toEntity, String toType) throws Exception {
+    @RequestMapping("/copy/{entity}/{fromType}/{toType}")
+    public ResponseResult copy(@PathVariable String entity,@PathVariable String fromType,@PathVariable String toType) throws Exception {
 
 
         MetaItemEntity meta = new MetaItemEntity();
-        meta.setEntity(fromEntity);
+        meta.setEntity(entity);
         meta.setType(fromType);
         SearchBean search = new SearchBean(meta);
         search.setDirection("asc");
@@ -87,19 +87,15 @@ public class MetaItemController extends BaseController<MetaItemEntity> {
         List<MetaItemEntity> list = result.getList();
 
 
-
-
-
         for (MetaItemEntity metaBean : list) {
             MetaItemEntity clone = BeanUtils.clone(MetaItemEntity.class, metaBean);
             clone.setId(null);
-            clone.setEntity(toEntity);
+            clone.setEntity(entity);
             clone.setType(toType);
             this.baseService.saveOrUpdate(clone);
             clone.setTimestamp(metaBean.getTimestamp());
             this.baseService.saveOrUpdate(clone);
         }
-
 
 
         return new ResponseResult(200,"复制成功");
