@@ -1,4 +1,4 @@
-package com.vala.framework.file.entity;
+package com.vala.base.entity;
 
 import com.vala.base.entity.BaseEntity;
 import com.vala.base.entity.FileColumn;
@@ -23,4 +23,6 @@ public class FileEntity extends TreeEntity {
     public String extension;
 
     public String server;
+
+    public Boolean disabled;
 }

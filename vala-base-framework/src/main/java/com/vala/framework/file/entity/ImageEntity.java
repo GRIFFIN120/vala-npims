@@ -1,6 +1,7 @@
 package com.vala.framework.file.entity;
 
 import com.vala.base.entity.FileColumn;
+import com.vala.base.entity.FileEntity;
 import lombok.Data;
 import lombok.ToString;
 

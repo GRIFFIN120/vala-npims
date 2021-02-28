@@ -1,8 +1,7 @@
 package com.vala.carbon.controllers;
 
-import com.vala.base.entity.FileColumn;
 import com.vala.framework.data.bean.DataFrameBean;
-import com.vala.framework.file.entity.FileEntity;
+import com.vala.base.entity.FileEntity;
 import com.vala.framework.user.entity.UserBasic;
 import lombok.Data;
 

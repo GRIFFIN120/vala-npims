@@ -5,7 +5,7 @@ import com.vala.base.entity.FileColumn;
 import com.vala.commons.bean.ResponseResult;
 import com.vala.commons.util.BeanUtils;
 import com.vala.framework.file.entity.EditorImage;
-import com.vala.framework.file.entity.FileEntity;
+import com.vala.base.entity.FileEntity;
 import com.vala.framework.file.entity.ImageEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;

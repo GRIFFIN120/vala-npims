@@ -10,9 +10,9 @@ import lombok.ToString;
 public class KV {
 
     public Object id;
-    public String name;
+    public Object name;
     public Object code;
-    public String label;
-    public String prop;
+    public Object label;
+    public Object prop;
 
 }

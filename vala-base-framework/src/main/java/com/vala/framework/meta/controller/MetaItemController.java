@@ -1,14 +1,17 @@
 package com.vala.framework.meta.controller;
 
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.vala.base.bean.SearchBean;
 import com.vala.base.bean.SearchResult;
 import com.vala.base.controller.BaseController;
 import com.vala.base.utils.XlsUtils;
+import com.vala.commons.bean.KV;
 import com.vala.commons.bean.ResponseResult;
 import com.vala.commons.util.BeanUtils;
 import com.vala.framework.meta.entity.MetaItemEntity;
+import org.apache.commons.collections.ArrayStack;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,20 +20,32 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/meta-item")
 public class MetaItemController extends BaseController<MetaItemEntity> {
 
 
+    @RequestMapping("/counts/{entity}")
+    public ResponseResult getCounts(@PathVariable String entity){
+        String sql = "SELECT type,COUNT(type) FROM  MetaItemEntity WHERE entity = '"+entity+"' GROUP BY type";
+        Query nativeQuery = this.baseService.getEntityManager().createQuery(sql);
+        List<Object[]> resultList = nativeQuery.getResultList();
+        Map map = new HashMap();
+
+        for (Object[] os : resultList) {
+            Object prop = os[0];
+            Object count = os[1];
+            map.put(prop,count);
+        }
+        return new ResponseResult(map);
+    }
 
 
 
