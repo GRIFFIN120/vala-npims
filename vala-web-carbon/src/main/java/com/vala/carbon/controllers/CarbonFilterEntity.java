@@ -5,10 +5,7 @@ import com.vala.base.entity.FileEntity;
 import com.vala.framework.user.entity.UserBasic;
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Entity
 @Data
@@ -27,5 +24,13 @@ public class CarbonFilterEntity extends FileEntity {
     public String state; // 计算中
 
     public Boolean expired;
+
+    public String method;
+
+    @Transient
+    public Boolean isPredictionAssigned;
+
+    @Transient
+    public Boolean isAdjustmentAssigned;
 
 }
