@@ -1,26 +1,17 @@
 package com.vala.carbon.controllers;
 
-import cn.hutool.core.util.ArrayUtil;
-import com.vala.base.service.FastDfsService;
 import com.vala.commons.bean.ResponseResult;
-import com.vala.framework.data.bean.DataBean;
 import com.vala.framework.data.bean.DataFrameTreeBean;
-import com.vala.framework.data.bean.DataItemBean;
 import com.vala.framework.file.controller.FileBaseController;
-import com.vala.framework.menu.entity.MenuItem;
 import com.vala.framework.user.entity.UserBasic;
-import com.vala.framework.utils.ExcelUtils;
-import com.vala.service.RService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.data.domain.Example;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.ByteArrayInputStream;
+import javax.transaction.Transactional;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/carbon-filter")
@@ -28,7 +19,6 @@ public class CarbonFilterController extends FileBaseController<CarbonFilterEntit
 
     @Autowired
     CarbonFilterService service;
-
     @RequestMapping("/exportResults")
     public ResponseResult exportResults(@RequestBody  CarbonFilterEntity filter) throws Exception {
         List<Object[]> fullData = this.service.getFullData(filter);
@@ -42,10 +32,6 @@ public class CarbonFilterController extends FileBaseController<CarbonFilterEntit
         List<Object[]> treeData = this.service.getTreeData(filter);
         return new ResponseResult(treeData);
     }
-
-
-
-
 
 
         @RequestMapping("/calculate")
@@ -66,12 +52,26 @@ public class CarbonFilterController extends FileBaseController<CarbonFilterEntit
         return new ResponseResult(200,"后台运算中，完成运算后可查看结果。",temp);
     }
 
-
-
-
-
-
-
+    @Transactional
+    @Override
+    public void beforeOutput(CarbonFilterEntity bean) {
+        Integer frameId = bean.getFrame().getId();
+        DataFrameTreeBean tree = new DataFrameTreeBean();
+        tree.setFrameId(frameId);
+        tree.setNodeType(2);
+        List<DataFrameTreeBean> all = this.baseService.getRepo().findAll(Example.of(tree));
+        boolean isAdjuest = true;
+        boolean isPredict =true;
+        for (DataFrameTreeBean data : all) {
+            if(!isAdjuest || !isPredict) break;
+            Double parameter = data.getParameter();
+            Double predict = data.getPredict();
+            isAdjuest = parameter != null;
+            isPredict = predict!=null;
+        }
+        bean.isAdjustmentAssigned = isAdjuest;
+        bean.isPredictionAssigned = isPredict;
+    }
 
     @Override
     public void beforeInsert(CarbonFilterEntity ext) {

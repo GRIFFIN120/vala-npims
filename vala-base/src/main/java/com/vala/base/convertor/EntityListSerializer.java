@@ -33,7 +33,7 @@ public class EntityListSerializer {
                     jsonGenerator.writeObject(baseEntity.getId());
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
             jsonGenerator.writeEndArray();
         }

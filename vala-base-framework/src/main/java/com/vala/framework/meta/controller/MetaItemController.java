@@ -31,6 +31,15 @@ import java.util.*;
 @RequestMapping("/meta-item")
 public class MetaItemController extends BaseController<MetaItemEntity> {
 
+    @Override
+    public void beforeOutput(MetaItemEntity bean) {
+        super.beforeOutput(bean);
+    }
+
+    @Override
+    public void beforeUpdate(MetaItemEntity ext, MetaItemEntity bean) {
+        super.beforeUpdate(ext, bean);
+    }
 
     @RequestMapping("/counts/{entity}")
     public ResponseResult getCounts(@PathVariable String entity){

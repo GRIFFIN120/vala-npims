@@ -37,5 +37,6 @@ public class MetaItemEntity extends BaseEntity {
     public Boolean download;
 
 
-
+    public Boolean editInTable;
+    public Boolean hideOnInsert;
 }

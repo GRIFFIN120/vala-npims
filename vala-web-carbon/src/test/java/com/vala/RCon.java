@@ -14,6 +14,14 @@ public class RCon {
         RConnection c = new RConnection("8.131.72.230");
         REXP x = c.eval("R.version.string");
         System.out.println(x.asString());
+    }
+
+    @Test
+    public void test1(){
+        double[] a = new double[3];
+        for (double v : a) {
+            System.out.println(v);
+        }
 
     }
 }

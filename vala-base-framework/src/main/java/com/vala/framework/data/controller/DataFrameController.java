@@ -5,10 +5,8 @@ import com.vala.base.controller.BaseController;
 import com.vala.base.entity.BaseEntity;
 import com.vala.commons.bean.ResponseResult;
 import com.vala.commons.util.Constants;
-import com.vala.framework.data.bean.DataBean;
-import com.vala.framework.data.bean.DataFrameBean;
-import com.vala.framework.data.bean.DataFrameTreeBean;
-import com.vala.framework.data.bean.DataItemBean;
+import com.vala.framework.data.bean.*;
+import com.vala.framework.menu.entity.MenuItem;
 import com.vala.framework.user.entity.UserBasic;
 import com.vala.framework.utils.ExcelUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -31,10 +29,8 @@ public class DataFrameController extends BaseController<DataFrameBean> {
         ext.setUser(userBasic);
     }
 
-    @Override
-    public void beforeUpdate(DataFrameBean ext, DataFrameBean bean) {
+    private void updateDataTree(DataFrameBean ext){
         Integer frameId = ext.getId();
-        if(ext.getData()==null) return;
         List<Integer> current = this.getCurrent(ext);
         Map<Integer,Integer> treed = this.getTreed(frameId);
         List<Integer> insert = new ArrayList<>(); // 要新增的
@@ -58,9 +54,47 @@ public class DataFrameController extends BaseController<DataFrameBean> {
         List<DataFrameTreeBean> deleteList = this.deleteTreeBeanList(delete,treed);
         this.baseService.getRepo().deleteAll(deleteList);
         this.baseService.getRepo().saveAll(insertList);
+    }
 
+    @Transactional
+    public void updateCore(DataFrameBean ext){
+        Integer frameId = ext.id;
+        DataFrameCategoryEntity exp = new DataFrameCategoryEntity();
+        exp.frameId = frameId;
+        List<DataFrameCategoryEntity> remove = this.baseService.find(exp);
+        this.baseService.getRepo().deleteAll(remove);
 
-        super.beforeUpdate(ext, bean);
+        Integer coreId = ext.getCore().id;
+        DataBean dataBean = baseService.get(DataBean.class, coreId);
+        DataItemBean itemExp = new DataItemBean();
+        itemExp.setData(dataBean);
+        List<DataItemBean> dataItemBeans = baseService.find(itemExp);
+        dataItemBeans.sort(Comparator.comparing(DataItemBean::getTimestamp).reversed());
+        List<DataFrameCategoryEntity> list = new ArrayList<>();
+
+        for (DataItemBean dataItemBean : dataItemBeans) {
+            String category = dataItemBean.getCategory();
+            DataFrameCategoryEntity cat = new DataFrameCategoryEntity();
+            cat.setCategory(category);
+            cat.setChecked(true);
+            cat.setFrameId(frameId);
+
+            list.add(cat);
+        }
+
+        this.baseService.getRepo().saveAll(list);
+        long timestamp = new Date().getTime();
+        for (DataFrameCategoryEntity dataFrameCategoryEntity : list) {
+            dataFrameCategoryEntity.setTimestamp(new Date(timestamp));
+            timestamp=timestamp-1000;
+        }
+
+    }
+
+    @Override
+    public void beforeUpdate(DataFrameBean ext, DataFrameBean bean) {
+        if(ext.getData()!=null) this.updateDataTree(ext);
+        if(ext.getCore()!=null) this.updateCore(ext);
     }
 
     private List<DataFrameTreeBean> insertTreeBeanList(List<Integer> insert, Integer frameId){
