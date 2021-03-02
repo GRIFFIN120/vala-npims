@@ -32,6 +32,25 @@ public class ExcelUtils {
     }
 
 
+    public static byte[] write(String name, List<Object[]> plainData) throws Exception {
+        Workbook wb = new XSSFWorkbook();
+        Sheet sheet = wb.createSheet(name);
+        for (int i = 0; i < plainData.size(); i++) {
+            Row row = sheet.createRow(i);
+            Object[] objects =  plainData.get(i);
+            for (int j = 0; j < objects.length; j++) {
+                Object v = objects[j];
+                Cell cell = row.createCell(j);
+                setCellValue(v,cell);
+            }
+        }
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        wb.write(outputStream);
+        byte[] bytes = outputStream.toByteArray();
+        return bytes;
+    }
+
+
     public static byte[]  write(String name, List titles, List<Object[]> list) throws Exception {
         Workbook wb = new XSSFWorkbook();
         Sheet sheet = wb.createSheet(name);

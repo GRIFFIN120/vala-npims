@@ -117,6 +117,7 @@ public class BaseServiceImpl<T extends BaseEntity> implements BaseService<T> {
         for (String name : map.keySet()) {
             Object value = map.get(name);
             Field field = domain.getDeclaredField(name);
+            System.out.println(name+","+field);
             field.setAccessible(true);
             field.set(bean,value);
         }

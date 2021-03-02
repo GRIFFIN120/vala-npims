@@ -54,7 +54,7 @@ public class RTest {
         for (String year : map.keySet()) {
             double[][] data = map.get(year);
             double[][] tdata = dataService.t(data);
-            double[] forest = rService.forest(tdata); // 调用R　 一个滚动窗做一次。
+            Double[] forest = rService.forest(tdata); // 调用R　 一个滚动窗做一次。
             String line = year+","+ArrayUtil.join(forest,",");
             System.out.println(line);
             list.add(line);

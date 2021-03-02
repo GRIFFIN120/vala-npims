@@ -7,8 +7,16 @@ import java.util.Map;
 
 public class OData {
 
+    public String name;
     public List<String> titles;
-    // 输出Charts时使用
-    public List<Map<String,Object>> list;
+    public List<Map<String,Object>> data;
 
+    public OData() {
+    }
+
+    public OData(String name, List<String> titles, List<Map<String, Object>> data) {
+        this.name = name;
+        this.titles = titles;
+        this.data = data;
+    }
 }

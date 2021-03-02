@@ -27,6 +27,13 @@ public class DataFrameTreeBean extends TreeEntity {
     @Transient
     List<DataItemBean> dataItems;
 
+//    @Transient
+//    double[] tempData;
+
+
     @Transient
-    double[] tempData;
+    public Double weight;
+
+    @Transient
+    public Double[] tempData;
 }

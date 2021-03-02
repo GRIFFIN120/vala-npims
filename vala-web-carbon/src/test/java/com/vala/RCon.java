@@ -6,6 +6,9 @@ import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class RCon {
 
@@ -18,10 +21,11 @@ public class RCon {
 
     @Test
     public void test1(){
-        double[] a = new double[3];
-        for (double v : a) {
-            System.out.println(v);
-        }
+
+        Double a = 0.0;
+        Double b  =null;
+        Double c = a+b;
+        System.out.println(c);
 
     }
 }

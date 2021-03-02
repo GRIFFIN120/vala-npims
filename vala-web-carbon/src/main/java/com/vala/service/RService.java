@@ -1,7 +1,10 @@
 package com.vala.service;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ArrayUtil;
+import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.Rserve.RConnection;
+import org.rosuda.REngine.Rserve.RserveException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +12,45 @@ import java.util.List;
 public class RService {
     private RConnection connection;
 
-    public double[] forest(double[][] data) throws Exception {
+    public String url = "8.131.72.230"; //"120.27.8.186"    "8.131.72.230"
+
+    public RService() throws Exception {
+        RConnection re = new RConnection(url);
+        REXP x = re.eval("R.version.string");
+        System.out.println(x.asString());
+        this.connection = re;
+    }
+
+    public void close(){
+        this.connection.close();
+    }
+
+
+    public Double forecast(Double[] column, int[] c, int size) throws Exception {
+        try {
+            double[] x = new double[column.length];
+            for (int i = 0; i < column.length; i++) {
+                x[i] = column[i];
+            }
+            int[] h = new int[]{size};
+            connection.voidEval("library(forecast)");
+            connection.assign("x",x);
+            connection.assign("c",c);
+            connection.assign("h",h);
+            connection.voidEval("fore = forecast(Arima(x,c),h=h)$mean;");
+            connection.voidEval("ret = as.vector(fore)");
+            double d = connection.eval("ret[length(ret)]").asDouble();
+            return d;
+        }catch (Exception e){
+            connection.close();
+            connection = new RConnection(url);
+            return column[column.length-1]; // ?check
+        }
+    }
+
+
+    public Double[] forest(double[][] data) throws Exception {
+        connection.voidEval("library(randomForest)");
         List<String> list = new ArrayList<>();
         for (int i = 0; i < data.length; i++) {
             double[] factor = data[i];
@@ -21,20 +62,7 @@ public class RService {
         connection.voidEval(line1);
         return forest();
     }
-
-    public String url = "8.131.72.230"; //"120.27.8.186"    "8.131.72.230"
-
-    public RService() throws Exception {
-        RConnection re = new RConnection(url);
-        re.voidEval("library(randomForest)");
-        this.connection = re;
-    }
-    public void close(){
-        this.connection.close();
-    }
-
-
-    private double[] forest() throws Exception {
+    private Double[] forest() throws Exception {
         connection.voidEval("sample = data");
         connection.voidEval("Y=sample$Y");
         connection.voidEval("Q3 = quantile(Y,0.33);Q6 = quantile(Y,0.66);");
@@ -47,6 +75,10 @@ public class RService {
         connection.voidEval("model = randomForest(sample$Y~.,data=sample,mtry=mtry,ntree=5000,importance=TRUE)");
         connection.voidEval("res = as.vector(model$importance[,5])");
         double[] res = connection.eval("res").asDoubles();
-        return res;
+        Double[] ret = new Double[res.length];
+        for (int i = 0; i < res.length; i++) {
+            ret[i] = res[i];
+        }
+        return ret;
     }
 }
