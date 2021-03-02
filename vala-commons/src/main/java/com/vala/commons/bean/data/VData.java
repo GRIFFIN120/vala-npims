@@ -3,6 +3,7 @@ package com.vala.commons.bean.data;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Data
@@ -211,6 +212,8 @@ public class VData {
             for (int i = 0; i < row.length ; i++) {
                 String key = "value"+i;
                 Double value = row[i];
+//                BigDecimal b   =   new   BigDecimal(value);
+//                double v = b.setScale(4, BigDecimal.ROUND_HALF_UP).doubleValue();
                 map.put(key,value);
             }
             data.add(map);
