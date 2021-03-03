@@ -1,7 +1,10 @@
 package com.vala.carbon.controllers;
 
-import cn.hutool.core.util.ArrayUtil;
 import com.vala.base.utils.TreeUtils;
+import com.vala.carbon.controllers.entity.CarbonFilterEntity;
+import com.vala.carbon.service.FilterService;
+import com.vala.carbon.service.ForecastService;
+import com.vala.carbon.service.ForestService;
 import com.vala.commons.bean.ResponseResult;
 import com.vala.commons.bean.data.OData;
 import com.vala.commons.bean.data.VData;
@@ -12,8 +15,6 @@ import com.vala.framework.data.service.FrameService;
 import com.vala.framework.file.controller.FileBaseController;
 import com.vala.framework.user.entity.UserBasic;
 import com.vala.framework.utils.ExcelUtils;
-import com.vala.service.RService;
-import org.rosuda.REngine.Rserve.RConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,30 +39,6 @@ public class CarbonFilterController extends FileBaseController<CarbonFilterEntit
 
     @Autowired
     ForestService forestService;
-
-    @Autowired
-    ForecastService forecastService;
-
-    @Transactional
-    @RequestMapping("/X")
-    public ResponseResult X(@RequestBody  CarbonFilterEntity filter) throws Exception {
-        Integer uid = this.getSession("UID",Integer.class);
-        forecastService.handler(filter.id,uid);
-        return new ResponseResult("运算中，请稍候... ");
-    }
-
-    @Transactional
-    @RequestMapping("/getCombine/{fieldName}")
-    public ResponseResult getCombine(@RequestBody  CarbonFilterEntity filter, @PathVariable String fieldName) throws Exception {
-        Field field =  CarbonFilterEntity.class.getField(fieldName);
-        String url = (String) field.get(filter);
-        byte[] read = this.fastDfsService.read(url);
-        List<Object[]> xlsx = ExcelUtils.read(new ByteArrayInputStream(read), "xlsx");
-        VData data = new VData(xlsx);
-        OData oData = data.toObjectData();
-        return new ResponseResult(oData);
-    }
-
 
 
 

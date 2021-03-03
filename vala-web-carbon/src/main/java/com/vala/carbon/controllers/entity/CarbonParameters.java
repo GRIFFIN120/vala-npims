@@ -1,4 +1,4 @@
-package com.vala.carbon.controllers;
+package com.vala.carbon.controllers.entity;
 
 import com.vala.base.entity.BaseEntity;
 import lombok.Data;

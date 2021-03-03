@@ -338,4 +338,12 @@ public class VData {
     }
 
 
+    public static double[] converter(Double[] values){
+        double[] ds = new double[values.length];
+        for (int i = 0; i < values.length; i++) {
+            ds[i] = values[i];
+        }
+        return ds;
+    }
+
 }

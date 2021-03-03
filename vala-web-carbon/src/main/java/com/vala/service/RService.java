@@ -2,13 +2,14 @@ package com.vala.service;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
+import lombok.Data;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@Data
 public class RService {
     private RConnection connection;
 

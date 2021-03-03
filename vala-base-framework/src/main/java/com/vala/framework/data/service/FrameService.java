@@ -58,6 +58,24 @@ public class FrameService {
         return categories;
     }
 
+    public Map<String, Double> getDataValuesById(Integer dataId){
+        Map<String, Double> map = new LinkedHashMap<>();
+
+        // 获得data下的items
+        DataItemBean exp = new DataItemBean();
+        DataBean dTemp = new DataBean();
+        dTemp.setId(dataId);
+        exp.setData(dTemp);
+        List<DataItemBean> items = baseService.find(exp);
+
+        for (DataItemBean item : items) {
+            String category = item.getCategory();
+            Double value = item.getValue();
+            map.put(category,value);
+        }
+        return map;
+    }
+
 
     private VData frameData(List<DataBean> data, List<String> categories , String titleFieldName) throws Exception {
         List titles = new ArrayList<>();
@@ -66,20 +84,7 @@ public class FrameService {
             Field field = DataBean.class.getField(titleFieldName);
             field.setAccessible(true);
             Object title = field.get(datum);
-            Map<String, Double> map = new HashMap<>();
-
-            // 获得data下的items
-            DataItemBean exp = new DataItemBean();
-            DataBean dTemp = new DataBean();
-            dTemp.setId(datum.getId());
-            exp.setData(dTemp);
-            List<DataItemBean> items = baseService.find(exp);
-
-            for (DataItemBean item : items) {
-                String category = item.getCategory();
-                Double value = item.getValue();
-                map.put(category,value);
-            }
+            Map<String, Double> map = getDataValuesById(datum.id);
             temp.put(title,map);
             titles.add(title);
         }

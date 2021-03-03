@@ -1,12 +1,12 @@
-package com.vala.carbon.controllers;
+package com.vala.carbon.service;
 
-import cn.hutool.core.util.ArrayUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vala.base.entity.BaseEntity;
 import com.vala.base.service.BaseService;
 import com.vala.base.service.FastDfsService;
 import com.vala.base.utils.TreeUtils;
+import com.vala.carbon.controllers.entity.CarbonFilterEntity;
 import com.vala.commons.bean.data.VData;
 import com.vala.framework.data.bean.DataFrameBean;
 import com.vala.framework.data.bean.DataFrameTreeBean;
@@ -20,7 +20,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.util.*;
 
 @Service
@@ -63,8 +62,9 @@ public class ForecastService {
         // 预测P, 并把预测值放在首位
         this.P_forecast(P,c,size);
         // 归一化P
-        // P.unify(null); // ?check  纵向归一化
         this.P_unify(P,tree);// ?check 横向归一化
+//        P.unify(null); // ?check  纵向归一化
+
 
         // -------------------加载V
         DataFrameBean frame = filterEntity.getFrame();
@@ -79,7 +79,6 @@ public class ForecastService {
         VData X = new VData(titles,categories);
         for (String category : categories) {
             for (Object title : titles) {
-                Integer dataId = (Integer) title;
                 Double p = P.getDataBy(title,category);
                 Double v = V.getDataBy(title,category);
                 Double a = A.getDataBy(title,category);
@@ -101,8 +100,8 @@ public class ForecastService {
         List<Object[]> xiPlain = xi.toPlainData();
         List<Object[]> xpPlain = xp.toPlainData();
 
-        byte[] xiBytes = ExcelUtils.write(filterEntity.name + "：因子耦合结果(历史)", xiPlain);
-        byte[] xpBytes = ExcelUtils.write(filterEntity.name + "：因子耦合结果（预测）", xpPlain);
+        byte[] xiBytes = ExcelUtils.write("因子耦合结果(历史)", xiPlain);
+        byte[] xpBytes = ExcelUtils.write("因子耦合结果（预测）", xpPlain);
 
         String xiPath = this.fastDfsService.upload(xiBytes, "xlsx");
         String xpPath = this.fastDfsService.upload(xpBytes, "xlsx");
