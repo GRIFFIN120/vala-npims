@@ -16,7 +16,7 @@ public class RCon {
     public void test() throws RserveException, REXPMismatchException {
         RConnection c = new RConnection("8.131.72.230");
         REXP x = c.eval("R.version.string");
-        System.out.println(x.asString());
+        System.out.println(x.asString()+"!");
     }
 
     @Test
